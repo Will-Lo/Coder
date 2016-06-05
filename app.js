@@ -5,7 +5,7 @@ var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var request = require('request');
-var async = require('async')
+var deasync = require('deasync');
 var routes = require('./routes/index');
 var users = require('./routes/users');
 var app = express();
@@ -110,7 +110,14 @@ var getWords = function(object) {
   var wordList = [];
   for (var i = 0; i < object.regions.length; i++) {
     for (var j = 0; j < object.regions[i].lines.length; j++) {
-      wordList.push(object.regions[i].lines[j].words);
+      var sentence = object.regions[i].lines[j].words;
+      if (sentence[sentence.length-1] === ':') {
+        nextSentence = '  ';
+      } else {
+        nextSentence = '';
+      }
+      wordList.push(sentence);
+      sentence=
     }
   }
   //flatten array and change boundingBox param
@@ -136,9 +143,11 @@ var getImageData = function(imageUrl, callback){
     if (!error && response.statusCode == 200) {
         var object = JSON.parse(body);
         var newObject = getWords(object);
+        console.log(newObject);
         return newObject;
     } else {
       console.log('error');
+      return;
     }
   });
 } 
@@ -147,15 +156,36 @@ var getImageData = function(imageUrl, callback){
 app.post('/sendcode', function(req, res) {
   var url = req.body.url;
   
-  var textList = getImageData(url, function(){
-      console.log(textList);
-      res.setHeader('Content-Type', 'application/json');
-      res.send(JSON.stringify(textList));
-      return;
-    });
-  // console.log(textList);
+  var textList;
+  var done = false;
+  textList = getImageData(url);
+  console.log(textList);
+  // getImageData(url, function cb(res){
+  //   textList = res;
+  //   done = true;
+  // });
+  // deasync.loopWhile(function(){return !done;});
   // res.setHeader('Content-Type', 'application/json');
-  // res.send(JSON.stringify(textList));
+  // res.send(textList);
+  // async.series([
+  //   function(callback){
+  //     textList = getImageData(url);
+      
+  //   },
+  //   function(callback){
+  //     res.setHeader('Content-Type', 'application/json');
+  //     res.send(textList);
+  //   }])
+  var getData = function(callback) {
+    setTimeout(function(){
+      console.log('in callback')
+      textList = getImageData(url);
+      callback();
+    }, 500);
+     res.setHeader('Content-Type', 'application/json');
+     res.send(JSON.stringify(getImageData(url)));
+     console.log('complete');
+  };
 });
 // getImageData('https://scontent-yyz1-1.xx.fbcdn.net/v/t34.0-12/13390906_1105341549508903_273747941_n.png?oh=9fc67b11a05eea027b503ac75e93d823&oe=575667C3');
 
