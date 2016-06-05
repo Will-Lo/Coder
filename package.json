@@ -1,0 +1,22 @@
+{
+  "name": "codr",
+  "version": "1.0.0",
+  "description": "Takes images of code and outputs them",
+  "main": "index.js",
+  "scripts": {
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Will-Lo/Codr.git"
+  },
+  "author": "Aditya Jain, William Lo",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Will-Lo/Codr/issues"
+  },
+  "homepage": "https://github.com/Will-Lo/Codr#readme",
+  "dependencies": {
+    "express": "^4.13.4"
+  }
+}
