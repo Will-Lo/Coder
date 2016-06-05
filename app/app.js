@@ -136,11 +136,17 @@ function getImageData(imageUrl){
         console.dir(object, {depth: null, colors: true});
         var newObject = getWords(object);
         console.log(newObject);
+        return newObject;
     }
   });
 }; 
 
-getImageData('https://scontent-yyz1-1.xx.fbcdn.net/v/t34.0-12/13390906_1105341549508903_273747941_n.png?oh=9fc67b11a05eea027b503ac75e93d823&oe=575667C3');
+app.get('/sendCode', function(req, res) {
+  var url = JSON.parse(req.url);
+  var text = getImageData(url);
+  res.end(JSON.stringify(text));
+});
+// getImageData('https://scontent-yyz1-1.xx.fbcdn.net/v/t34.0-12/13390906_1105341549508903_273747941_n.png?oh=9fc67b11a05eea027b503ac75e93d823&oe=575667C3');
 
 
 module.exports = app;
