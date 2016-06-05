@@ -117,13 +117,12 @@ var getWords = function(object) {
         nextSentence = '';
       }
       wordList.push(sentence);
-      sentence=
-    }
   }
   //flatten array and change boundingBox param
   var newList = changeStringToArray([].concat.apply([], wordList));
   var finalList = sortWords(newList);
   return finalList;
+  }
 }
 
 var getImageData = function(imageUrl, callback){
@@ -150,7 +149,7 @@ var getImageData = function(imageUrl, callback){
       return;
     }
   });
-} 
+}
 
 
 app.post('/sendcode', function(req, res) {
@@ -160,22 +159,7 @@ app.post('/sendcode', function(req, res) {
   var done = false;
   textList = getImageData(url);
   console.log(textList);
-  // getImageData(url, function cb(res){
-  //   textList = res;
-  //   done = true;
-  // });
-  // deasync.loopWhile(function(){return !done;});
-  // res.setHeader('Content-Type', 'application/json');
-  // res.send(textList);
-  // async.series([
-  //   function(callback){
-  //     textList = getImageData(url);
-      
-  //   },
-  //   function(callback){
-  //     res.setHeader('Content-Type', 'application/json');
-  //     res.send(textList);
-  //   }])
+
   var getData = function(callback) {
     setTimeout(function(){
       console.log('in callback')
@@ -187,7 +171,5 @@ app.post('/sendcode', function(req, res) {
      console.log('complete');
   };
 });
-// getImageData('https://scontent-yyz1-1.xx.fbcdn.net/v/t34.0-12/13390906_1105341549508903_273747941_n.png?oh=9fc67b11a05eea027b503ac75e93d823&oe=575667C3');
-
 
 module.exports = app;
