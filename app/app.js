@@ -4,6 +4,7 @@ var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
+var request = require('request');
 
 var routes = require('./routes/index');
 var users = require('./routes/users');
@@ -58,6 +59,30 @@ app.use(function(err, req, res, next) {
     error: {}
   });
 });
+
+
+function getImageData(imageUrl){
+  //test url: http://postimg.org/image/kzxy42env/
+  var options = {                 
+    method: 'POST',             
+    url: 'https://api.projectoxford.ai/vision/v1.0/ocr',
+    headers: {               
+      'Content-Type': 'application/json',
+      'Ocp-Apim-Subscription-Key': '3088d79d73b445eeb58b3313f30e6beb'       
+    },
+    body: JSON.stringify({                  
+      url: imageUrl 
+    })
+  }
+  request(options, function(error, response, body){
+    if (!error && response.statusCode == 200) {
+        var object = JSON.parse(body);
+        console.dir(object, {depth: null, colors: true})
+    }
+  })
+}; 
+
+getImageData('http://s33.postimg.org/pnpqkzjnj/13393506_1105268579516200_1088892518_n.jpg');
 
 
 module.exports = app;
