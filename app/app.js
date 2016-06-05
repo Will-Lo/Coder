@@ -60,6 +60,62 @@ app.use(function(err, req, res, next) {
   });
 });
 
+var changeStringToArray = function(wordList) {
+  //the final array is temp
+  var intParamList = wordList;
+  for (var i = 0; i < wordList.length; i++) {
+    var str = wordList[i].boundingBox;
+    var temp = str.split(",");
+    for (a in temp) {
+      temp[a] = parseInt(temp[a], 10);
+    }
+    intParamList[i].boundingBox = temp;
+  }
+  return intParamList;
+}
+
+var sortWords = function(wordList) {
+  var heightSortedList = wordList.sort(function(firstWord, secondWord) {
+    return (firstWord.boundingBox[1] - secondWord.boundingBox[1])
+  });
+  var sortedList = {lines: []};
+
+  for (var i = 0; i < wordList.length; i++) {
+     newLineHeight = wordList[i].boundingBox;
+     //while the height is within a range
+     var lineData = {}
+     var line = [];
+     var j = i;
+     //ensure that words are read from left to right
+     while (wordList[j] && Math.abs(newLineHeight[1] - wordList[j].boundingBox[1]) < 5) {
+       line.push(wordList[j]);
+       j++;
+     }
+     i = j;
+     i--;
+     var sortedSentence = line.sort(function(firstWord, secondWord){
+        return (firstWord.boundingBox[0] - secondWord.boundingBox[0]);
+     });
+     var sentenceText = sortedSentence.map(function(word){return word.text});
+     lineData.text = sentenceText.join(" ");
+     lineData.boundingBox = newLineHeight;
+     sortedList.lines.push(lineData);
+  }
+  return sortedList;
+}
+
+var getWords = function(object) {
+  var wordList = [];
+  for (var i = 0; i < object.regions.length; i++) {
+    for (var j = 0; j < object.regions[i].lines.length; j++) {
+      wordList.push(object.regions[i].lines[j].words);
+    }
+  }
+  //flatten array and change boundingBox param
+  var newList = changeStringToArray([].concat.apply([], wordList));
+  var finalList = sortWords(newList);
+  return finalList;
+}
 
 function getImageData(imageUrl){
   //test url: http://postimg.org/image/kzxy42env/
@@ -77,12 +133,14 @@ function getImageData(imageUrl){
   request(options, function(error, response, body){
     if (!error && response.statusCode == 200) {
         var object = JSON.parse(body);
-        console.dir(object, {depth: null, colors: true})
+        console.dir(object, {depth: null, colors: true});
+        var newObject = getWords(object);
+        console.log(newObject);
     }
-  })
+  });
 }; 
 
-getImageData('http://s33.postimg.org/pnpqkzjnj/13393506_1105268579516200_1088892518_n.jpg');
+getImageData('https://scontent-yyz1-1.xx.fbcdn.net/v/t34.0-12/13390906_1105341549508903_273747941_n.png?oh=9fc67b11a05eea027b503ac75e93d823&oe=575667C3');
 
 
 module.exports = app;
