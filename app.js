@@ -5,13 +5,14 @@ var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var request = require('request');
-
+var async = require('async')
 var routes = require('./routes/index');
 var users = require('./routes/users');
-
 var app = express();
 console.log('App running on http:/localhost:3000')
 // view engine setup
+app.use('/', routes);
+
 app.engine('html', require('ejs').renderFile);
 app.set('view engine', 'html');
 app.set('views', path.join(__dirname, 'views'));
@@ -118,8 +119,8 @@ var getWords = function(object) {
   return finalList;
 }
 
-function getImageData(imageUrl){
-  //test url: http://postimg.org/image/kzxy42env/
+var getImageData = function(imageUrl, callback){
+
   var options = {                 
     method: 'POST',             
     url: 'https://api.projectoxford.ai/vision/v1.0/ocr',
@@ -134,18 +135,27 @@ function getImageData(imageUrl){
   request(options, function(error, response, body){
     if (!error && response.statusCode == 200) {
         var object = JSON.parse(body);
-        console.dir(object, {depth: null, colors: true});
         var newObject = getWords(object);
-        console.log(newObject);
         return newObject;
+    } else {
+      console.log('error');
     }
   });
-}; 
+} 
 
-app.get('/sendCode', function(req, res) {
-  var url = JSON.parse(req.url);
-  var text = getImageData(url);
-  res.end(JSON.stringify(text));
+
+app.post('/sendcode', function(req, res) {
+  var url = req.body.url;
+  
+  var textList = getImageData(url, function(){
+      console.log(textList);
+      res.setHeader('Content-Type', 'application/json');
+      res.send(JSON.stringify(textList));
+      return;
+    });
+  // console.log(textList);
+  // res.setHeader('Content-Type', 'application/json');
+  // res.send(JSON.stringify(textList));
 });
 // getImageData('https://scontent-yyz1-1.xx.fbcdn.net/v/t34.0-12/13390906_1105341549508903_273747941_n.png?oh=9fc67b11a05eea027b503ac75e93d823&oe=575667C3');
 

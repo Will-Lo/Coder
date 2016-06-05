@@ -76,7 +76,23 @@ function runit() {
        function(err) {
        console.log(err.toString());
    });
-} 
+}
+$(document).ready(function(){
+
+	$('#sendurl').click(function(){
+		var data = document.getElementById('urlarea').value;
+		console.log(data);
+		$.ajax({
+			type: "POST",
+	  	url: 'http://localhost:3000/sendcode',
+	  	contentType: 'application/json',
+	  	data: JSON.stringify({url: data}),
+	  	success: function(data){
+	  		console.log(data);
+	  	}
+		});
+	})
+})
 </script>
 
 		<!-- Header -->
@@ -103,9 +119,9 @@ function runit() {
 					<!--	<li><a href="#content" class="button big alt">Upload Image</a></li>
 					<li><a href="#elements" class="button big alt">Learn More</a></li> -->
 					<form>
-				      <textarea id="something" cols="1" rows="1" placeholder="Enter URL here" ></textarea>
+				      <textarea id="urlarea" cols="1" rows="1" placeholder="Enter URL here" ></textarea>
 				      <br/>
-                       <button type="button" class="button big alt" onclick="">Send</button>
+                       <button type="button" id="sendurl" class="button big alt">Send</button>
 					</form>	
 					</ul>
 				</div>
