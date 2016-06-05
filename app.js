@@ -112,6 +112,7 @@ var getWords = function(object) {
     for (var j = 0; j < object.regions[i].lines.length; j++) {
       var sentence = object.regions[i].lines[j].words;
       if (sentence[sentence.length-1] === ':') {
+        console.log('i found a colon');
         nextSentence = '  ';
       } else {
         nextSentence = '';
@@ -125,7 +126,7 @@ var getWords = function(object) {
   }
 }
 
-var getImageData = function(imageUrl, callback){
+var getImageData = function(imageUrl, res){
 
   var options = {                 
     method: 'POST',             
@@ -143,33 +144,30 @@ var getImageData = function(imageUrl, callback){
         var object = JSON.parse(body);
         var newObject = getWords(object);
         console.log(newObject);
-        return newObject;
-    } else {
-      console.log('error');
+        res.setHeader('Content-Type', 'application/json');
+        res.send(JSON.stringify(newObject));    
+      } else {
+      console.log(response);
       return;
     }
   });
 }
 
+// var getData = function(url, success) {
+//   var textList;
+//   AsyncStuff(function(){
+//     textList = getImageData(url);
+//   }{
+//     data = JSON.stringify(textList);
+//     success(data);
+//   };
+// };
 
 app.post('/sendcode', function(req, res) {
   var url = req.body.url;
-  
-  var textList;
-  var done = false;
-  textList = getImageData(url);
-  console.log(textList);
-
-  var getData = function(callback) {
-    setTimeout(function(){
-      console.log('in callback')
-      textList = getImageData(url);
-      callback();
-    }, 500);
-     res.setHeader('Content-Type', 'application/json');
-     res.send(JSON.stringify(getImageData(url)));
-     console.log('complete');
-  };
+  getImageData(url, res);
+  //console.log(textList)
+  //res.setHeader('Content-Type', 'application/json'); 
 });
 
 module.exports = app;
